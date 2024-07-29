@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import argparse
+import json
 import logging
+
+from netgaze_agent.stomp_client import StompClient
 
 
 def main():
@@ -10,11 +13,8 @@ def main():
     args = parser.parse_args()
 
     operation = args.operation
-    port = args.port
 
     if operation == 'start':
-        if port:
-            _start()
         _start()
     elif operation == 'version':
         _version()
@@ -24,6 +24,26 @@ def main():
 
 def _start():
     logging.info(f"Starting...")
+    data = {
+        "name": "Test Agent",
+        "host": "1.2.3.4",
+        "lastSeenAt": 1715114647900,
+        "connections": [
+            {
+                "name": "Google",
+                "description": "Connection to Google",
+                "type": "HTTP",
+                "host": "google.com",
+                "port": 80,
+                "active": True,
+                "lastCheckedAt": 1715114647695
+            }
+        ]
+    }
+    url = 'localhost:8080/netgaze-agent-event-listener'
+    client = StompClient(url, sockjs=False, wss=False)
+    client.connect()
+    client.send("/app/event-listener", json.dumps(data))
 
 
 def _version():
