@@ -1,6 +1,6 @@
 import json
 
-from stomp_client import StompClient
+from netgaze_agent.stomp_client import StompClient
 
 data = {
     "name": "Test Agent",
